@@ -1,3 +1,6 @@
+NOTE: ./xor.go, ./xor_test.go are licensed differently - they are from 
+the GO source code.
+
 The MIT License (MIT)
 
 Copyright (C) 2015 Philip Schlump
