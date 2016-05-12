@@ -1,5 +1,7 @@
 # AesCCM - An imlementation of CCM for signing AES encrypted messages
 
+ [![license](http://img.shields.io/badge/license-MIT-red.svg?style=flat)](https://raw.githubusercontent.com/pschlump/Go-FTL/master/LICENSE)
+
 Note: this has been designed to work specifically with the Go-FTL AesSRP middleware.
 It should be a general purpose CCM implementation - but all of the testing has been
 
