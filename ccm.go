@@ -428,16 +428,16 @@ func maximumLengthForMessage(L uint64, TagSize uint64) int {
 	if !is64BitArch {
 		//godebug.Printf(db2, "**** At: %s\n", godebug.LF())
 		return int(math.MaxInt32 - TagSize)
-	} else {
-		max := (uint64(1) << (8 * L)) - 1 // 32 bit maximum length - works with SJCL
-		if m64 := uint64(math.MaxInt64) - TagSize; L > 8 || max > m64 {
-			//godebug.Printf(db2, "At: %s\n", godebug.LF())
-			return (int(m64)) // The maximum lentgh on a 64bit arch
-		}
-		return int(max)
 	}
+	max := (uint64(1) << (8 * L)) - 1 // 32 bit maximum length - works with SJCL
+	if m64 := uint64(math.MaxInt64) - TagSize; L > 8 || max > m64 {
+		//godebug.Printf(db2, "At: %s\n", godebug.LF())
+		return (int(m64)) // The maximum lentgh on a 64bit arch
+	}
+	return int(max)
+	// }
 	//godebug.Printf(db2, "At: %s\n", godebug.LF())
-	return int(math.MaxInt32)
+	// return int(math.MaxInt32)
 }
 
 const db1 = false

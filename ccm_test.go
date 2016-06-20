@@ -52,14 +52,14 @@ func TestMaxLength(t *testing.T) {
 	for noncelen, pos := min, 0; noncelen <= max; noncelen++ {
 		AesCCM, err := NewCCM(aes, TagLength, noncelen)
 		if err != nil {
-			t.Fatalf("NewCCM Test %d - noncelen=%d - Should have succeded - Error: %s", pos, noncelen, err)
+			t.Fatalf("NewCCM Test %v - noncelen=%d - Should have succeded - Error: %s", pos, noncelen, err)
 		}
 		maxlen := AesCCM.MaxLength()   // Get the maximum length now
 		if is64BitArch && maxlen < 0 { // skip test on 32 bit systems
-			t.Error("MaxLength(): Test %d - negative - initcating error - 32bit system limitation - noncelen:%d maxlen%d", pos, noncelen, maxlen)
+			t.Errorf("MaxLength(): Test %d - negative - initcating error - 32bit system limitation - noncelen:%d maxlen%d", pos, noncelen, maxlen)
 		}
 		if uint64(maxlen) > maxavail {
-			t.Error("MaxLength(): Test %d - missing TAG room", pos)
+			t.Errorf("MaxLength(): Test %v - missing TAG room", pos)
 		}
 		pos++
 	}
@@ -107,7 +107,7 @@ func TestAESCCM(t *testing.T) {
 		var err error
 		rv, err = hex.DecodeString(vv)
 		if err != nil {
-			t.Errorf("AesCCM FATAL ERROR: Unable to setup AES, input hex failed to parse, test:#%d", vv, i)
+			t.Errorf("AesCCM FATAL ERROR: Unable to setup AES, input hex failed to parse, %v test:#%d", vv, i)
 			return
 		}
 		return
@@ -314,7 +314,7 @@ func Test_maximumLengthForMessage(t *testing.T) {
 
 		if true {
 			if kk := maximumLengthForMessage(vv.L, vv.TagSize); kk != vv.out {
-				t.Errorf("Invalid NonceLength Test %d, Expected %d, got %d\n", ii, vv.out, vv.out, kk)
+				t.Errorf("Invalid NonceLength Test %d, Expected %d, got %d, test %d\n", ii, vv.out, vv.out, kk)
 			}
 		}
 	}
