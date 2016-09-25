@@ -116,3 +116,23 @@ func (b Base64Data) ConvToString() string {
 	return string(text)
 	//return fmt.Sprintf("%s = %v", text, b.int32Array())
 }
+
+func (b *Base64Data) CopyIn(text []byte) {
+	if n := base64.StdEncoding.DecodedLen(len(text)); cap(*b) < n {
+		*b = make([]byte, n)
+	}
+	copy(*b, text)
+	// base64.StdEncoding.Encode(text, *b)
+}
+
+func (b Base64Data) IsEmpty() bool {
+	if len(b) == 0 {
+		return true
+	}
+	for _, ww := range b {
+		if ww != 0 {
+			return false
+		}
+	}
+	return true
+}

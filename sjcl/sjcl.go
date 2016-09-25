@@ -11,9 +11,14 @@ import (
 	"io/ioutil"
 	"log"
 
-	"github.com/pschlump/aesccm/base64data"
+	//
+	"github.com/pschlump/AesCCM"
+	"github.com/pschlump/AesCCM/base64data"
+	"github.com/pschlump/godebug"
 	"github.com/pschlump/json" //	"encoding/json"
 )
+
+// "github.com/pschlump/AesCCM"                 //
 
 type SJCL_DataStruct struct {
 	InitilizationVector base64data.Base64Data `json:"iv"`     // initilization vector or nonce for CCM mode
@@ -95,3 +100,33 @@ func ConvertSJCL(file string) (eBlob SJCL_DataStruct, err error, msg string) {
 	eBlob.KeySizeBytes = eBlob.KeySize / 8
 	return
 }
+
+// ============================================================================================================================================
+func GetNonce(encData SJCL_DataStruct) (nonce []byte, nlen int) {
+	if dbCipher {
+		fmt.Printf("AT: %s\n", godebug.LF())
+	}
+	nonce = []byte(encData.InitilizationVector)
+	if db2 {
+		fmt.Printf("tagsize: %d in bytes: %d\n", encData.TagSize, encData.TagSizeBytes)
+	}
+	nlen = aesccm.MaxNonceLength(len(encData.CipherText) - encData.TagSizeBytes)
+	if db2 {
+		fmt.Printf("max nlen:%d\n", nlen)
+	}
+	if nlen > len(nonce) {
+		nlen = len(nonce)
+	} else {
+		nonce = nonce[:nlen] // trim nonce to the first X bytes - that is all that is used ( this is SJCL specific )
+	}
+	if db2 {
+		fmt.Printf("nlen: %d\n", nlen)
+	}
+	// debug_hex("nonce", nonce)
+	return
+}
+
+const db2 = false
+const dbCipher = false
+
+/* vim: set noai ts=4 sw=4: */
