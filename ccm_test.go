@@ -114,7 +114,7 @@ func TestAESCCM(t *testing.T) {
 	}
 
 	for i, v := range testDataRfc3610 {
-		godebug.Printf(db_TestAESCCM, "Test: %d ---------------------------------------------------------------------------\n", i)
+		godebug.Printf("Test: %d ---------------------------------------------------------------------------\n", i)
 
 		key := decodeAndCheck(v.key, i)
 		nonce := decodeAndCheck(v.nonce, i)
@@ -310,7 +310,7 @@ func Test_maximumLengthForMessage(t *testing.T) {
 		// func maximumLengthForMessage(L uint64, TagSize uint64) int {
 		jj := maximumLengthForMessage(vv.L, vv.TagSize)
 
-		godebug.Printf(db_TestAESCCM_1, "L %d TagSize %d Out %d\n", vv.L, vv.TagSize, jj)
+		godebug.Printf("L %d TagSize %d Out %d\n", vv.L, vv.TagSize, jj)
 
 		if true {
 			if kk := maximumLengthForMessage(vv.L, vv.TagSize); kk != vv.out {
@@ -320,8 +320,5 @@ func Test_maximumLengthForMessage(t *testing.T) {
 	}
 
 }
-
-const db_TestAESCCM = false
-const db_TestAESCCM_1 = false
 
 /* vim: set noai ts=4 sw=4: */

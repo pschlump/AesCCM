@@ -355,7 +355,7 @@ func (ccmt *CCMType) Seal(dst, nonce, plaintext, adata []byte) (rv []byte) {
 	ccmt.err = nil // No errors yet
 
 	// if nonce is too long then truncate it.
-	NonceLength := CalculateNonceLengthFromMessageLength(len(plaintext))
+	NonceLength := CalculateNonceLengthFromMessageLength(int(ccmt.L))
 	if len(nonce) > NonceLength {
 		nonce = nonce[0:NonceLength]
 	}
