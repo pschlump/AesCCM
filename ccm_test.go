@@ -235,29 +235,6 @@ func Test_01(t *testing.T) {
 
 }
 
-func Test_NonceLength(t *testing.T) {
-	var testData = []struct {
-		in    int
-		nonce int
-	}{
-		{nonce: 13, in: 20},
-		{nonce: 13, in: 200},
-		{nonce: 13, in: 2000},
-		{nonce: 13, in: 20000},
-		{nonce: 12, in: 200000},
-		{nonce: 12, in: 2000000},
-		{nonce: 11, in: 20000000},
-		{nonce: 11, in: 200000000},
-	}
-
-	for ii, vv := range testData {
-		if kk := CalculateNonceLengthFromMessageLength(vv.in); kk != vv.nonce {
-			t.Errorf("Invalid NonceLength Test %d, Expected %d, got %d\n", ii, vv.nonce, kk)
-		}
-	}
-
-}
-
 func BenchmarkAESCCMSeal(b *testing.B) {
 	var key [aes.BlockSize]byte
 	var nonce [13]byte
