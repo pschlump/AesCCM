@@ -31,6 +31,7 @@ type CCMType struct {
 	blk cipher.Block //
 	M   uint64       // # of octets(bytes) in authentication field	(field size 3) == (M-2)/2
 	L   uint64       // # of octets(bytes) in length field			(field size 3) == L-1
+	N   uint64       // nonce size
 	err error
 }
 
@@ -112,7 +113,7 @@ func newCCMType(blk cipher.Block, TagSize int, NonceSize int) (c *CCMType, err e
 	}
 
 	// All Good - return it.
-	c = &CCMType{blk: blk, M: uint64(TagSize), L: uint64(l)}
+	c = &CCMType{blk: blk, M: uint64(TagSize), L: uint64(l), N: uint64(NonceSize)}
 	return
 }
 
@@ -170,20 +171,6 @@ func MaxNonceLength(pdatalen int) int {
 		}
 	}
 	return 0
-}
-
-// Working with SJCL assumes that you have a 32 bit arcitecture and this limits the outputs from this.
-func CalculateNonceLengthFromMessageLength(lenOfPlaintext int) int {
-	var L int
-	// ivl := 4 * 4 // ivl  - length of 'iv' in bytes -				// From SJCL
-
-	// compute the length of the length
-	// 63     for (L=2; L<4 && lenOfPlaintext >>> 8*L; L++) {}		// From SJCL
-	for L = 2; L < 4 && (lenOfPlaintext>>uint32(8*L)) > 0; L++ {
-	}
-	// 64     if (L < 15 - ivl) { L = 15-ivl; } 					// From SJCL
-	// 65     iv = w.clamp(iv,8*(15-L));
-	return 15 - L
 }
 
 /*
@@ -355,12 +342,11 @@ func (ccmt *CCMType) Seal(dst, nonce, plaintext, adata []byte) (rv []byte) {
 	ccmt.err = nil // No errors yet
 
 	// if nonce is too long then truncate it.
-	NonceLength := CalculateNonceLengthFromMessageLength(len(plaintext))
-	if len(nonce) > NonceLength {
-		nonce = nonce[0:NonceLength]
+	if len(nonce) > int(ccmt.N) {
+		nonce = nonce[0:ccmt.N]
 	}
 
-	if ll := 15 - NonceLength; ll != int(ccmt.L) {
+	if ll := 15 - int(ccmt.N); ll != int(ccmt.L) {
 		// godebug.Printf(db1, "****************** l=%d ccmt.L=%d\n", ll, ccmt.L)
 		ccmt.err = ErrInvalidNonceLength
 		return
@@ -389,9 +375,8 @@ func (ccmt *CCMType) Seal(dst, nonce, plaintext, adata []byte) (rv []byte) {
 func (ccmt *CCMType) Open(dst, nonce, ct, adata []byte) ([]byte, error) {
 	var InitializationVector [CcmBlockSize]byte
 
-	NonceLength := CalculateNonceLengthFromMessageLength(len(ct) - int(ccmt.M))
-	if len(nonce) > NonceLength {
-		nonce = nonce[0:NonceLength] // Truncate if too long
+	if len(nonce) > int(ccmt.N) {
+		nonce = nonce[0:int(ccmt.N)] // Truncate if too long
 	}
 
 	if len(ct) > ccmt.MaxLength()+ccmt.Overhead() {
@@ -424,9 +409,9 @@ func (ccmt *CCMType) Open(dst, nonce, ct, adata []byte) ([]byte, error) {
 }
 
 func maximumLengthForMessage(L uint64, TagSize uint64) int {
-	//godebug.Printf(db2, "input L=%v TagSize=%v, %s\n", L, TagSize, godebug.LF())
+	//godebug.Printf("input L=%v TagSize=%v, %s\n", L, TagSize, godebug.LF())
 	if !is64BitArch {
-		//godebug.Printf(db2, "**** At: %s\n", godebug.LF())
+		//godebug.Printf("**** At: %s\n", godebug.LF())
 		return int(math.MaxInt32 - TagSize)
 	}
 	max := (uint64(1) << (8 * L)) - 1 // 32 bit maximum length - works with SJCL
@@ -436,11 +421,8 @@ func maximumLengthForMessage(L uint64, TagSize uint64) int {
 	}
 	return int(max)
 	// }
-	//godebug.Printf(db2, "At: %s\n", godebug.LF())
+	//godebug.Printf("At: %s\n", godebug.LF())
 	// return int(math.MaxInt32)
 }
-
-const db1 = false
-const db2 = false
 
 /* vim: set noai ts=4 sw=4: */

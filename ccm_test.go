@@ -114,7 +114,7 @@ func TestAESCCM(t *testing.T) {
 	}
 
 	for i, v := range testDataRfc3610 {
-		godebug.Printf(db_TestAESCCM, "Test: %d ---------------------------------------------------------------------------\n", i)
+		godebug.Printf("Test: %d ---------------------------------------------------------------------------\n", i)
 
 		key := decodeAndCheck(v.key, i)
 		nonce := decodeAndCheck(v.nonce, i)
@@ -235,29 +235,6 @@ func Test_01(t *testing.T) {
 
 }
 
-func Test_NonceLength(t *testing.T) {
-	var testData = []struct {
-		in    int
-		nonce int
-	}{
-		{nonce: 13, in: 20},
-		{nonce: 13, in: 200},
-		{nonce: 13, in: 2000},
-		{nonce: 13, in: 20000},
-		{nonce: 12, in: 200000},
-		{nonce: 12, in: 2000000},
-		{nonce: 11, in: 20000000},
-		{nonce: 11, in: 200000000},
-	}
-
-	for ii, vv := range testData {
-		if kk := CalculateNonceLengthFromMessageLength(vv.in); kk != vv.nonce {
-			t.Errorf("Invalid NonceLength Test %d, Expected %d, got %d\n", ii, vv.nonce, kk)
-		}
-	}
-
-}
-
 func BenchmarkAESCCMSeal(b *testing.B) {
 	var key [aes.BlockSize]byte
 	var nonce [13]byte
@@ -310,7 +287,7 @@ func Test_maximumLengthForMessage(t *testing.T) {
 		// func maximumLengthForMessage(L uint64, TagSize uint64) int {
 		jj := maximumLengthForMessage(vv.L, vv.TagSize)
 
-		godebug.Printf(db_TestAESCCM_1, "L %d TagSize %d Out %d\n", vv.L, vv.TagSize, jj)
+		godebug.Printf("L %d TagSize %d Out %d\n", vv.L, vv.TagSize, jj)
 
 		if true {
 			if kk := maximumLengthForMessage(vv.L, vv.TagSize); kk != vv.out {
@@ -320,8 +297,5 @@ func Test_maximumLengthForMessage(t *testing.T) {
 	}
 
 }
-
-const db_TestAESCCM = false
-const db_TestAESCCM_1 = false
 
 /* vim: set noai ts=4 sw=4: */
